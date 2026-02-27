@@ -13,6 +13,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.views import PasswordResetView as DjangoPasswordResetView
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
@@ -597,3 +598,21 @@ def export_logs_xlsx(request):
     except ImportError:
         # Fallback: CSV com extensão xlsx se openpyxl não estiver instalado
         return export_logs_csv(request)
+
+
+# ── Password Reset com SMTP do banco ─────────────────────────────
+class CustomPasswordResetView(DjangoPasswordResetView):
+    template_name = 'password_reset/form.html'
+    success_url = '/password-reset/done/'
+
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email, html_email_template_name=None):
+        reset_url = (
+            context['protocol'] + '://' + context['domain'] +
+            '/password-reset/' + context['uid'] + '/' + context['token'] + '/'
+        )
+        from .email_utils import send_password_reset_email
+        try:
+            send_password_reset_email(context['user'], reset_url, to_email)
+        except Exception:
+            pass  # falha silenciosa — não revelar se e-mail existe

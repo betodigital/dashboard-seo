@@ -208,6 +208,37 @@ def send_lockout_alert(ip_address, username, user_agent=''):
             pass
 
 
+def send_password_reset_email(user, reset_url, to_email=None):
+    """
+    Envia e-mail de redefinição de senha com link seguro.
+    Returns (True, None) or (False, error_message).
+    """
+    email = to_email or user.email
+    if not email:
+        return False, 'Usuário não possui e-mail cadastrado.'
+
+    from .config_utils import get_config
+    system_name = get_config('system_name', 'MyApp') or 'MyApp'
+    app_url = get_config('app_url', 'http://localhost:8000')
+
+    try:
+        profile = user.profile
+        display_name = profile.get_display_name() or user.username
+    except Exception:
+        display_name = user.username
+
+    context = {
+        'display_name': display_name,
+        'username':     user.username,
+        'reset_url':    reset_url,
+        'system_name':  system_name,
+        'app_url':      app_url,
+    }
+    html_body = render_to_string('emails/password_reset.html', context)
+    subject = f'Redefinição de senha — {system_name}'
+    return send_html_email(email, subject, html_body)
+
+
 def send_test_email(to_email):
     """Send a simple test email to verify SMTP settings."""
     html_body = """

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Senha Alterada — {{ system_name }}{% endblock %}
+
+{% block content %}
+<div class="auth-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <div class="auth-header">
+        <div class="auth-logo" style="background:rgba(34,197,94,.15);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h1>Senha Alterada!</h1>
+        <p>Sua senha foi redefinida com sucesso.</p>
+      </div>
+
+      <a href="{% url 'login' %}" class="btn-primary" style="display:flex;text-decoration:none;justify-content:center;align-items:center;gap:.5rem;">
+        <span>Entrar agora</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

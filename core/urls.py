@@ -18,6 +18,23 @@ urlpatterns = [
     path('settings/logs/export/xlsx/', views.export_logs_xlsx,       name='export_logs_xlsx'),
     path('logout/',    auth_views.LogoutView.as_view(), name='logout'),
 
+    # Reset de senha
+    path('password-reset/',
+         views.CustomPasswordResetView.as_view(),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(template_name='password_reset/done.html'),
+         name='password_reset_done'),
+    path('password-reset/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='password_reset/confirm.html',
+             success_url='/password-reset/complete/',
+         ),
+         name='password_reset_confirm'),
+    path('password-reset/complete/',
+         auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/complete.html'),
+         name='password_reset_complete'),
+
     # Gestão de usuários
     path('users/',              views.users_list_view,  name='users_list'),
     path('users/novo/',         views.user_create_view, name='user_create'),

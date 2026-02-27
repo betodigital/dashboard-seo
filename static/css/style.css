@@ -911,3 +911,17 @@ svg { display:block; flex-shrink:0; }
   .log-filter-group input, .log-filter-group select { min-width: 100%; }
   .log-export-bar { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── Password Reset ────────────────────────────────────────────── */
+.auth-footer-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+.auth-footer-link a {
+  color: var(--accent);
+  font-size: 0.875rem;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.auth-footer-link a:hover { opacity: 1; }
