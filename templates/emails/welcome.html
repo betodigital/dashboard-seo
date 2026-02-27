@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Bem-vindo ao MyApp</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0f;min-height:100vh;">
+    <tr>
+      <td align="center" style="padding:48px 20px;">
+
+        <!-- Card principal -->
+        <table width="580" cellpadding="0" cellspacing="0"
+               style="max-width:580px;background-color:#13131a;border-radius:20px;overflow:hidden;border:1px solid #2a2a3a;box-shadow:0 25px 50px rgba(0,0,0,.6);">
+
+          <!-- Header com gradiente -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#6c63ff 0%,#a78bfa 100%);padding:48px 40px;text-align:center;">
+              <!-- Logo -->
+              <table cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
+                <tr>
+                  <td align="center" style="width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:16px;text-align:center;vertical-align:middle;">
+                    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" style="display:block;margin:14px auto 0;">
+                      <path d="M20 4L36 12V28L20 36L4 28V12L20 4Z" fill="white" fill-opacity="0.9"/>
+                      <path d="M20 12L28 16V24L20 28L12 24V16L20 12Z" fill="rgba(108,99,255,0.8)"/>
+                    </svg>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 8px;font-size:32px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">MyApp</p>
+              <p style="margin:0;font-size:15px;color:rgba(255,255,255,0.75);font-weight:400;">Plataforma de Gestao</p>
+            </td>
+          </tr>
+
+          <!-- Conteudo principal -->
+          <tr>
+            <td style="padding:44px 40px 32px;">
+
+              <!-- Saudacao -->
+              <p style="margin:0 0 8px;font-size:24px;font-weight:700;color:#f1f5f9;">
+                Bem-vindo, {{ display_name }}!
+              </p>
+              <p style="margin:0 0 28px;font-size:15px;color:#94a3b8;line-height:1.6;">
+                Sua conta foi criada com sucesso. Voce ja pode acessar o sistema com as credenciais abaixo.
+              </p>
+
+              <!-- Info da conta -->
+              <table width="100%" cellpadding="0" cellspacing="0"
+                     style="background:#1e1e2e;border-radius:12px;border:1px solid #2a2a3a;margin-bottom:28px;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding:6px 0;">
+                          <span style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.8px;font-weight:600;">Seu usuario</span>
+                          <br/>
+                          <span style="font-size:20px;font-weight:700;color:#a78bfa;letter-spacing:.5px;">{{ username }}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Permissoes -->
+              {% if permissions_list %}
+              <p style="margin:0 0 14px;font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.8px;">
+                Acessos liberados
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                {% for perm in permissions_list %}
+                <tr>
+                  <td style="padding:7px 0;border-bottom:1px solid #1e1e2e;">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="width:24px;height:24px;background:linear-gradient(135deg,#6c63ff,#a78bfa);border-radius:6px;text-align:center;vertical-align:middle;">
+                          <span style="color:#fff;font-size:13px;font-weight:700;line-height:24px;">&#10003;</span>
+                        </td>
+                        <td style="padding-left:12px;font-size:14px;color:#cbd5e1;">{{ perm }}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+              {% endif %}
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:8px;">
+                    <a href="{{ app_url }}"
+                       style="display:inline-block;background:linear-gradient(135deg,#6c63ff,#a78bfa);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:15px 40px;border-radius:10px;letter-spacing:.3px;">
+                      Acessar o Sistema &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Divisor -->
+          <tr>
+            <td style="padding:0 40px;">
+              <hr style="border:none;border-top:1px solid #2a2a3a;margin:0;"/>
+            </td>
+          </tr>
+
+          <!-- Nota de seguranca -->
+          <tr>
+            <td style="padding:24px 40px;">
+              <table width="100%" cellpadding="0" cellspacing="0"
+                     style="background:#1a1a2e;border-radius:10px;border-left:3px solid #f59e0b;">
+                <tr>
+                  <td style="padding:14px 18px;">
+                    <p style="margin:0;font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:4px;">
+                      &#9888; Dica de seguranca
+                    </p>
+                    <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.5;">
+                      Se voce nao reconhece este cadastro, entre em contato imediatamente
+                      com o administrador do sistema.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 40px 32px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#334155;line-height:1.6;">
+                Este e-mail foi gerado automaticamente pelo <strong style="color:#475569;">MyApp</strong>.<br/>
+                Por favor, nao responda a esta mensagem.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

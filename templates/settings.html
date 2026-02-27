@@ -1,0 +1,722 @@
+{% extends 'base.html' %}
+{% block title %}Configurações — {{ system_name }}{% endblock %}
+{% block content %}
+<div class="app-layout">
+  {% include 'partials/sidebar.html' with active_page='settings' %}
+  <div class="main-area">
+    {% include 'partials/topbar.html' with page_title='Configurações' breadcrumb='Início / Configurações' %}
+
+    <main class="page-body">
+
+      {% if messages %}
+      <div class="alert-box">
+        {% for m in messages %}
+        <div class="alert alert-{{ m.tags }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ m }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="page-header">
+        <div>
+          <h2 class="section-title">Configurações do Sistema</h2>
+          <p class="section-sub">Gerencie configurações gerais, e-mail, banco de dados e integrações de IA</p>
+        </div>
+      </div>
+
+      <!-- Tabs Nav -->
+      <div class="settings-tabs">
+        <button class="tab-btn {% if active_tab == 'general' %}active{% endif %}" data-tab="general">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M21 12h-2M5 12H3M12 19v2M12 3v2"/>
+          </svg>
+          Geral
+        </button>
+        <button class="tab-btn {% if active_tab == 'email' %}active{% endif %}" data-tab="email">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          E-mail / SMTP
+        </button>
+        <button class="tab-btn {% if active_tab == 'database' %}active{% endif %}" data-tab="database">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+          Banco de Dados
+        </button>
+        <button class="tab-btn {% if active_tab == 'openai' %}active{% endif %}" data-tab="openai">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+          Inteligência Artificial
+        </button>
+        <a href="{% url 'logs' %}" class="tab-btn {% if active_tab == 'logs' %}active{% endif %}" style="text-decoration:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Log de Acessos
+        </a>
+      </div>
+
+      <!-- ══ TAB: GERAL ══════════════════════════════════════════════ -->
+      <div class="tab-panel {% if active_tab == 'general' %}active{% endif %}" id="panel-general">
+
+        <form method="post" action="/settings/?tab=general">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="general"/>
+
+          <div class="settings-section">
+            <h3 class="settings-section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M21 12h-2M5 12H3M12 19v2M12 3v2"/>
+              </svg>
+              Identidade do Sistema
+            </h3>
+            <div class="form-grid form-grid--2">
+              <div class="field-group">
+                <label for="system_name">Nome do Sistema</label>
+                <input type="text" id="system_name" name="system_name"
+                  value="{{ general_cfg.system_name|default:'MyApp' }}"
+                  placeholder="MyApp"/>
+                <small style="color:var(--text3);font-size:.78rem;margin-top:.35rem;display:block;">
+                  Aparece no cabeçalho, e-mails e no nome dos arquivos exportados (ex: <em>MeuSistema_logs_20260227.xlsx</em>)
+                </small>
+              </div>
+              <div class="field-group">
+                <label for="app_url">URL do Sistema (para e-mails)</label>
+                <input type="url" id="app_url" name="app_url"
+                  value="{{ general_cfg.app_url|default:'http://localhost:8000' }}"
+                  placeholder="http://192.168.15.220:8000"/>
+                <small style="color:var(--text3);font-size:.78rem;margin-top:.35rem;display:block;">
+                  Link do botão "Acessar o Sistema" nos e-mails de boas-vindas
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Salvar Configurações Gerais
+            </button>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- ══ TAB: EMAIL ══════════════════════════════════════════════ -->
+      <div class="tab-panel {% if active_tab == 'email' %}active{% endif %}" id="panel-email">
+
+        <div class="info-box info-box--info" style="margin-bottom:1.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <div>
+            <strong>Servidor SMTP externo obrigatório</strong><br/>
+            Para que os e-mails cheguem na caixa de entrada é necessário usar um servidor SMTP autenticado.
+            Sugestões: <strong>Gmail</strong> smtp.gmail.com:587 (TLS) |
+            <strong>Outlook</strong> smtp.office365.com:587 (TLS) |
+            <strong>SendGrid</strong> smtp.sendgrid.net:587
+          </div>
+        </div>
+
+        <form method="post" action="/settings/?tab=email">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="email"/>
+
+          <div class="settings-section">
+            <h3 class="settings-section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              Servidor SMTP
+            </h3>
+            <div class="form-grid form-grid--3">
+              <div class="field-group field-group--wide">
+                <label for="smtp_host">Servidor SMTP</label>
+                <input type="text" id="smtp_host" name="smtp_host"
+                  value="{{ smtp.smtp_host }}" placeholder="smtp.gmail.com"/>
+              </div>
+              <div class="field-group">
+                <label for="smtp_port">Porta</label>
+                <input type="number" id="smtp_port" name="smtp_port"
+                  value="{{ smtp.smtp_port|default:'587' }}" placeholder="587"/>
+              </div>
+            </div>
+            <div class="form-grid form-grid--2">
+              <div class="field-group">
+                <label for="smtp_user">Usuário SMTP</label>
+                <input type="text" id="smtp_user" name="smtp_user"
+                  value="{{ smtp.smtp_user }}" placeholder="seuemail@gmail.com"/>
+              </div>
+              <div class="field-group">
+                <label for="smtp_password">Senha SMTP</label>
+                <div class="input-pw-wrap">
+                  <input type="password" id="smtp_password" name="smtp_password"
+                    value="{{ smtp.smtp_password }}" placeholder="Senha ou senha de app"
+                    autocomplete="new-password"/>
+                  <button type="button" class="btn-toggle-pw" onclick="togglePwField('smtp_password','eye-smtp')">
+                    <svg id="eye-smtp" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="form-grid form-grid--2" style="margin-top:.25rem;">
+              <div class="field-group field-toggle">
+                <label class="toggle-label">
+                  <span>Usar TLS (recomendado para porta 587)</span>
+                  <div class="toggle-wrap">
+                    <input type="checkbox" id="smtp_use_tls" name="smtp_use_tls" class="toggle-input"
+                      {% if smtp.smtp_use_tls != '0' %}checked{% endif %}>
+                    <span class="toggle-track"></span>
+                  </div>
+                </label>
+              </div>
+              <div class="field-group field-toggle">
+                <label class="toggle-label">
+                  <span>Usar SSL (para porta 465)</span>
+                  <div class="toggle-wrap">
+                    <input type="checkbox" id="smtp_use_ssl" name="smtp_use_ssl" class="toggle-input"
+                      {% if smtp.smtp_use_ssl == '1' %}checked{% endif %}>
+                    <span class="toggle-track"></span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3 class="settings-section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              Remetente
+            </h3>
+            <div class="form-grid form-grid--2">
+              <div class="field-group">
+                <label for="email_from_name">Nome do Remetente</label>
+                <input type="text" id="email_from_name" name="email_from_name"
+                  value="{{ smtp.email_from_name|default:'MyApp' }}" placeholder="MyApp"/>
+              </div>
+              <div class="field-group">
+                <label for="email_from">E-mail de Origem</label>
+                <input type="email" id="email_from" name="email_from"
+                  value="{{ smtp.email_from }}" placeholder="noreply@meudominio.com"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <div class="test-email-wrap">
+              <input type="email" id="test_to_email" placeholder="E-mail para teste (opcional)"
+                value="{{ request.user.email }}"/>
+              <button type="button" class="btn-test" id="btnTestEmail" onclick="sendTestEmail()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                Enviar Teste
+              </button>
+              <span id="testResult" class="test-result" style="display:none;"></span>
+            </div>
+            <button type="submit" class="btn-save">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Salvar E-mail
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ══ TAB: DATABASE ═══════════════════════════════════════════ -->
+      <div class="tab-panel {% if active_tab == 'database' %}active{% endif %}" id="panel-database">
+
+        <div class="info-box info-box--warning" style="margin-bottom:1.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <strong>Atenção:</strong> Alterar o banco de dados requer <strong>reinicialização do servidor</strong>
+            para entrar em vigor. As configurações salvas aqui ficam registradas no sistema.
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="settings-section-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Conexão Atual (ativa)
+          </h3>
+          <div class="db-current-grid">
+            <div class="db-info-card">
+              <span class="db-info-label">Motor</span>
+              <span class="db-info-value">{{ db_current.engine }}</span>
+            </div>
+            <div class="db-info-card">
+              <span class="db-info-label">Host</span>
+              <span class="db-info-value">{{ db_current.host }}</span>
+            </div>
+            <div class="db-info-card">
+              <span class="db-info-label">Porta</span>
+              <span class="db-info-value">{{ db_current.port }}</span>
+            </div>
+            <div class="db-info-card">
+              <span class="db-info-label">Banco</span>
+              <span class="db-info-value">{{ db_current.name }}</span>
+            </div>
+            <div class="db-info-card">
+              <span class="db-info-label">Usuário</span>
+              <span class="db-info-value">{{ db_current.user }}</span>
+            </div>
+            <div class="db-info-card">
+              <span class="db-info-label">Senha</span>
+              <span class="db-info-value" style="letter-spacing:.2em;">••••••••</span>
+            </div>
+          </div>
+        </div>
+
+        <form method="post" action="/settings/?tab=database">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="database"/>
+
+          <div class="settings-section">
+            <h3 class="settings-section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Nova Configuração (requer reinício)
+            </h3>
+            <div class="form-grid form-grid--3">
+              <div class="field-group field-group--wide">
+                <label for="db_host">Host do Banco</label>
+                <input type="text" id="db_host" name="db_host"
+                  value="{{ db_cfg.db_host|default:db_current.host }}" placeholder="localhost"/>
+              </div>
+              <div class="field-group">
+                <label for="db_port">Porta</label>
+                <input type="number" id="db_port" name="db_port"
+                  value="{{ db_cfg.db_port|default:db_current.port }}" placeholder="5432"/>
+              </div>
+            </div>
+            <div class="form-grid form-grid--2">
+              <div class="field-group">
+                <label for="db_name">Nome do Banco</label>
+                <input type="text" id="db_name" name="db_name"
+                  value="{{ db_cfg.db_name|default:db_current.name }}" placeholder="django_app"/>
+              </div>
+              <div class="field-group">
+                <label for="db_user">Usuário</label>
+                <input type="text" id="db_user" name="db_user"
+                  value="{{ db_cfg.db_user|default:db_current.user }}" placeholder="postgres"/>
+              </div>
+            </div>
+            <div class="form-grid form-grid--2">
+              <div class="field-group">
+                <label for="db_password">Senha</label>
+                <div class="input-pw-wrap">
+                  <input type="password" id="db_password" name="db_password"
+                    value="{{ db_cfg.db_password }}" placeholder="Senha do banco"
+                    autocomplete="new-password"/>
+                  <button type="button" class="btn-toggle-pw" onclick="togglePwField('db_password','eye-db')">
+                    <svg id="eye-db" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Salvar Banco de Dados
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ══ TAB: OPENAI ═════════════════════════════════════════════ -->
+      <div class="tab-panel {% if active_tab == 'openai' %}active{% endif %}" id="panel-openai">
+
+        <form method="post" action="/settings/?tab=openai" id="formOpenAI">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="openai"/>
+
+          <!-- Seção: OpenAI -->
+          <div class="settings-section">
+            <h3 class="settings-section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+              API OpenAI
+            </h3>
+
+            <div class="ai-status-row">
+              <span class="status-dot {% if has_openai_key %}status-dot--ok{% else %}status-dot--off{% endif %}" id="statusDot"></span>
+              <span style="font-size:.85rem;color:var(--text2)" id="statusLabel">
+                {% if has_openai_key %}Chave configurada{% else %}Não configurada{% endif %}
+              </span>
+            </div>
+
+            <div class="field-group" style="max-width:520px;">
+              <label for="openai_api_key">Chave de API (API Key)</label>
+              <div class="input-pw-wrap">
+                <input type="password" id="openai_api_key" name="openai_api_key"
+                  value="{% if has_openai_key %}{{ ai_cfg.openai_api_key }}{% endif %}"
+                  placeholder="sk-proj-..." autocomplete="new-password"/>
+                <button type="button" class="btn-toggle-pw" onclick="togglePwField('openai_api_key','eye-ai')">
+                  <svg id="eye-ai" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <small style="color:var(--text3);font-size:.78rem;margin-top:.35rem;display:block;">
+                Obtenha sua chave em <strong>platform.openai.com/api-keys</strong>
+              </small>
+            </div>
+
+          </div>
+
+          <div class="form-actions" style="margin-bottom:1.5rem;">
+            <button type="button" class="btn-connect" id="btnFetchModels" onclick="fetchOpenAIModels()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Conectar e buscar modelos
+            </button>
+            <button type="submit" class="btn-save">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Salvar Configurações de IA
+            </button>
+          </div>
+        </form>
+
+        <!-- Resultado dos modelos -->
+        <div id="aiResult" style="display:none;">
+          <div id="aiError" class="info-box info-box--warning" style="display:none;margin-bottom:1rem;"></div>
+          <div id="modelsWrap" style="display:none;">
+            <p style="font-size:.85rem;color:var(--text2);margin-bottom:.75rem;font-weight:600;">
+              Modelos disponíveis na sua conta:
+            </p>
+            <div class="model-grid" id="modelGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: LOGS ═══════════════════════════════════════════════ -->
+      <div class="tab-panel {% if active_tab == 'logs' %}active{% endif %}" id="panel-logs">
+
+        <!-- Filtros -->
+        <form method="get" action="{% url 'logs' %}" class="log-filter-bar">
+          <div class="log-filter-group">
+            <label>Período rápido</label>
+            <div class="log-preset-btns">
+              <a href="{% url 'logs' %}?period=7d"  class="log-preset {% if period == '7d'  %}active{% endif %}">7 dias</a>
+              <a href="{% url 'logs' %}?period=30d" class="log-preset {% if period == '30d' %}active{% endif %}">30 dias</a>
+              <a href="{% url 'logs' %}?period=90d" class="log-preset {% if period == '90d' %}active{% endif %}">90 dias</a>
+            </div>
+          </div>
+          <div class="log-filter-group">
+            <label for="date_from">De</label>
+            <input type="date" id="date_from" name="date_from" value="{{ date_from_str }}"/>
+          </div>
+          <div class="log-filter-group">
+            <label for="date_to">Até</label>
+            <input type="date" id="date_to" name="date_to" value="{{ date_to_str }}"/>
+          </div>
+          <div class="log-filter-group">
+            <label for="log_event">Evento</label>
+            <select id="log_event" name="event">
+              <option value="">Todos</option>
+              {% for val, label in event_choices %}
+              <option value="{{ val }}" {% if event_filter == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="log-filter-group">
+            <label for="log_user">Usuário</label>
+            <input type="text" id="log_user" name="username" value="{{ user_filter }}" placeholder="Filtrar por usuário"/>
+          </div>
+          <button type="submit" class="btn-save" style="align-self:flex-end;padding:.55rem 1.1rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Filtrar
+          </button>
+        </form>
+
+        <!-- Stats cards -->
+        <div class="log-stats-grid">
+          <div class="log-stat-card">
+            <span class="log-stat-value">{{ stats.total }}</span>
+            <span class="log-stat-label">Total de eventos</span>
+          </div>
+          <div class="log-stat-card log-stat-card--ok">
+            <span class="log-stat-value">{{ stats.login_ok }}</span>
+            <span class="log-stat-label">Logins bem-sucedidos</span>
+          </div>
+          <div class="log-stat-card log-stat-card--fail">
+            <span class="log-stat-value">{{ stats.login_fail }}</span>
+            <span class="log-stat-label">Tentativas falhas</span>
+          </div>
+          <div class="log-stat-card log-stat-card--out">
+            <span class="log-stat-value">{{ stats.logout }}</span>
+            <span class="log-stat-label">Logouts</span>
+          </div>
+          <div class="log-stat-card" style="border-top:3px solid #ef4444;">
+            <span class="log-stat-value" style="color:#f87171;">{{ stats.lockout }}</span>
+            <span class="log-stat-label">&#x1F512; IPs bloqueados</span>
+          </div>
+        </div>
+
+        <!-- Barra de exportação -->
+        <div class="log-export-bar">
+          <span style="font-size:.82rem;color:var(--text3)">
+            Horário de Brasília (SP) — Atualizado em {{ now_sp }}
+          </span>
+          <div class="log-export-btns">
+            <span style="font-size:.82rem;color:var(--text2);font-weight:600;">Exportar:</span>
+            <a href="{% url 'export_logs_csv' %}?date_from={{ date_from_str }}&date_to={{ date_to_str }}&event={{ event_filter }}&username={{ user_filter }}"
+               class="btn-export">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              CSV
+            </a>
+            <a href="{% url 'export_logs_txt' %}?date_from={{ date_from_str }}&date_to={{ date_to_str }}&event={{ event_filter }}&username={{ user_filter }}"
+               class="btn-export">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              TXT
+            </a>
+            <a href="{% url 'export_logs_xlsx' %}?date_from={{ date_from_str }}&date_to={{ date_to_str }}&event={{ event_filter }}&username={{ user_filter }}"
+               class="btn-export btn-export--xlsx">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              XLSX
+            </a>
+          </div>
+        </div>
+
+        <!-- Tabela de logs -->
+        <div class="table-card">
+          <div class="table-wrap">
+            <table class="data-table log-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora (SP)</th>
+                  <th>Usuário</th>
+                  <th>Evento</th>
+                  <th>IP</th>
+                  <th>User Agent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in logs %}
+                <tr>
+                  <td class="log-ts">{{ log.timestamp }}</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar avatar-sm" style="font-size:.7rem;">{{ log.username|first|upper }}</div>
+                      <span>{{ log.username }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {% if log.event == 'login_ok' %}
+                      <span class="badge badge-green">{{ log.event_label }}</span>
+                    {% elif log.event == 'login_fail' %}
+                      <span class="badge badge-red">{{ log.event_label }}</span>
+                    {% elif log.event == 'lockout' %}
+                      <span class="badge" style="background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(239,68,68,.3);">&#x1F512; {{ log.event_label }}</span>
+                    {% else %}
+                      <span class="badge" style="background:rgba(148,163,184,.12);color:var(--text2);">{{ log.event_label }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="log-ip">{{ log.ip_address }}</td>
+                  <td class="log-ua text-secondary">{{ log.user_agent }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" style="text-align:center;padding:2.5rem;color:var(--text3);">
+                    Nenhum registro encontrado para o período selecionado.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if logs %}
+          <div class="table-footer">
+            <span style="font-size:.78rem;color:var(--text3);">
+              Exibindo {{ logs|length }} registro{{ logs|length|pluralize:"s" }} (máx. 500 por consulta)
+            </span>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script>
+// ── Tab switching ───────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    history.replaceState(null, '', '?tab=' + btn.dataset.tab);
+  });
+});
+
+// ── Toggle senha ────────────────────────────────────────────────
+function togglePwField(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+// ── Teste de e-mail (AJAX) ──────────────────────────────────────
+function sendTestEmail() {
+  const btn     = document.getElementById('btnTestEmail');
+  const result  = document.getElementById('testResult');
+  const toEmail = document.getElementById('test_to_email').value.trim();
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviando...';
+  result.style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('to_email', toEmail);
+  fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+  fetch('{% url "test_email" %}', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      result.style.display = 'inline-flex';
+      if (data.ok) {
+        result.className = 'test-result test-result--ok';
+        result.textContent = '✓ E-mail enviado com sucesso!';
+      } else {
+        result.className = 'test-result test-result--fail';
+        result.textContent = '✗ ' + (data.error || 'Erro desconhecido');
+      }
+    })
+    .catch(() => {
+      result.style.display = 'inline-flex';
+      result.className = 'test-result test-result--fail';
+      result.textContent = '✗ Erro de conexão';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Enviar Teste';
+    });
+}
+
+// ── Buscar modelos OpenAI (AJAX) ────────────────────────────────
+function fetchOpenAIModels() {
+  const btn       = document.getElementById('btnFetchModels');
+  const resultDiv = document.getElementById('aiResult');
+  const errorDiv  = document.getElementById('aiError');
+  const modelsWrap = document.getElementById('modelsWrap');
+  const grid      = document.getElementById('modelGrid');
+  const statusDot = document.getElementById('statusDot');
+  const statusLbl = document.getElementById('statusLabel');
+
+  const key = document.getElementById('openai_api_key').value.trim();
+  if (!key) {
+    resultDiv.style.display = 'block';
+    errorDiv.textContent = 'Informe a chave de API antes de conectar.';
+    errorDiv.style.display = 'flex';
+    modelsWrap.style.display = 'none';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Conectando...';
+  resultDiv.style.display = 'none';
+  errorDiv.style.display  = 'none';
+  modelsWrap.style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+  fetch('{% url "fetch_openai_models" %}', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      resultDiv.style.display = 'block';
+      if (!data.ok) {
+        errorDiv.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ' + (data.error || 'Erro desconhecido');
+        errorDiv.style.display = 'flex';
+        return;
+      }
+      modelsWrap.style.display = 'block';
+      grid.innerHTML = '';
+      if (!data.models || data.models.length === 0) {
+        grid.innerHTML = '<p style="color:var(--text3)">Nenhum modelo encontrado para esta chave.</p>';
+      } else {
+        data.models.forEach(id => {
+          const isPro = id.includes('gpt-4') || id.startsWith('o1') || id.startsWith('o3') || id.startsWith('o4');
+          const badge = isPro
+            ? '<span class="model-badge model-badge--pro">Pro</span>'
+            : '<span class="model-badge">Base</span>';
+          grid.innerHTML += `<div class="model-card"><span class="model-card-id">${id}</span>${badge}</div>`;
+        });
+      }
+      statusDot.className = 'status-dot status-dot--ok';
+      statusLbl.textContent = 'Conectado — ' + (data.models ? data.models.length : 0) + ' modelos';
+    })
+    .catch(() => {
+      resultDiv.style.display = 'block';
+      errorDiv.textContent = 'Erro de conexão com o servidor.';
+      errorDiv.style.display = 'flex';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Conectar e buscar modelos';
+    });
+}
+</script>
+{% endblock %}

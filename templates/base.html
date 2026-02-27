@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ system_name }}{% endblock %}</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#6c63ff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="{{ system_name }}" />
+  <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
+
+  <!-- Windows / outros -->
+  <meta name="msapplication-TileImage" content="{% static 'icons/icon-144x144.png' %}" />
+  <meta name="msapplication-TileColor" content="#6c63ff" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}" />
+  <link rel="shortcut icon" href="{% static 'icons/favicon.ico' %}" />
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+  {% block content %}{% endblock %}
+  <script src="{% static 'js/main.js' %}"></script>
+  <script>
+    // Registra o Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

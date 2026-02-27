@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% block title %}Relatórios — {{ system_name }}{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  {% include 'partials/sidebar.html' with active_page='reports' %}
+
+  <!-- Main content -->
+  <div class="main-area">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div>
+          <h2 class="page-title">Relatórios</h2>
+          <span class="breadcrumb">Início / Relatórios</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <!-- Theme toggle -->
+        <div class="theme-switcher" id="themeSwitcher" title="Alternar tema">
+          <button class="theme-btn" data-theme="light" title="Claro">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
+          <button class="theme-btn" data-theme="dark" title="Escuro">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          <button class="theme-btn" data-theme="system" title="Sistema">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="user-badge">
+          <div class="avatar">{{ user.username|first|upper }}</div>
+          <div class="user-info">
+            <span class="user-name">{{ user.username }}</span>
+            <span class="user-role">{% if user.is_superuser %}Superusuário{% else %}Usuário{% endif %}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page body -->
+    <main class="page-body">
+
+      <!-- Date filter bar -->
+      <div class="filter-bar">
+        <div class="filter-left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="filter-label">Período:</span>
+          <div class="date-range">
+            <input type="date" id="dateFrom" class="date-input" />
+            <span class="date-sep">até</span>
+            <input type="date" id="dateTo" class="date-input" />
+          </div>
+        </div>
+        <div class="filter-right">
+          <div class="preset-btns">
+            <button class="preset-btn active" data-preset="7">7 dias</button>
+            <button class="preset-btn" data-preset="30">30 dias</button>
+            <button class="preset-btn" data-preset="90">90 dias</button>
+            <button class="preset-btn" data-preset="365">1 ano</button>
+          </div>
+          <button class="btn-apply" id="applyFilter">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Aplicar
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI row -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon kpi-purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpiVisits">12.483</div>
+            <div class="kpi-label">Visitas</div>
+          </div>
+          <div class="kpi-trend kpi-trend-up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            <span id="kpiVisitsDelta">+12%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon kpi-green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpiRevenue">R$ 84.230</div>
+            <div class="kpi-label">Receita</div>
+          </div>
+          <div class="kpi-trend kpi-trend-up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            <span id="kpiRevenueDelta">+8%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon kpi-blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpiUsers">3.847</div>
+            <div class="kpi-label">Usuários Ativos</div>
+          </div>
+          <div class="kpi-trend kpi-trend-down">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+            <span id="kpiUsersDelta">-3%</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon kpi-orange">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="kpi-body">
+            <div class="kpi-value" id="kpiConv">4,7%</div>
+            <div class="kpi-label">Conversão</div>
+          </div>
+          <div class="kpi-trend kpi-trend-up">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            <span id="kpiConvDelta">+0.5%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row 1 -->
+      <div class="charts-row">
+        <div class="chart-card chart-card--wide">
+          <div class="chart-header">
+            <div>
+              <h3>Visitas & Receita</h3>
+              <p>Evolução no período selecionado</p>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-dot" style="background:#6c63ff"></span> Visitas
+              <span class="legend-dot" style="background:#22c55e"></span> Receita
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chartLine"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Fontes de Tráfego</h3>
+              <p>Distribuição por canal</p>
+            </div>
+          </div>
+          <div class="chart-wrap chart-wrap--donut">
+            <canvas id="chartDonut"></canvas>
+          </div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+
+      <!-- Charts row 2 -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Vendas por Categoria</h3>
+              <p>Comparativo entre categorias</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chartBar"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Desempenho Semanal</h3>
+              <p>Meta vs. realizado</p>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chartRadar"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Sidebar overlay for mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+{% endblock %}
