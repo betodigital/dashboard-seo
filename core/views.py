@@ -605,14 +605,26 @@ class CustomPasswordResetView(DjangoPasswordResetView):
     template_name = 'password_reset/form.html'
     success_url = '/password-reset/done/'
 
-    def send_mail(self, subject_template_name, email_template_name,
-                  context, from_email, to_email, html_email_template_name=None):
-        reset_url = (
-            context['protocol'] + '://' + context['domain'] +
-            '/password-reset/' + context['uid'] + '/' + context['token'] + '/'
-        )
+    def form_valid(self, form):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
+        from django.utils.http import urlsafe_base64_encode
+        from django.contrib.auth import get_user_model
         from .email_utils import send_password_reset_email
-        try:
-            send_password_reset_email(context['user'], reset_url, to_email)
-        except Exception:
-            pass  # falha silenciosa — não revelar se e-mail existe
+
+        UserModel = get_user_model()
+        email = form.cleaned_data['email']
+        protocol = 'https' if self.request.is_secure() else 'http'
+        domain = self.request.get_host()
+
+        for user in form.get_users(email):
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_url = f'{protocol}://{domain}/password-reset/{uid}/{token}/'
+            try:
+                send_password_reset_email(user, reset_url, getattr(user, UserModel.get_email_field_name()))
+            except Exception:
+                pass  # falha silenciosa — não revelar se e-mail existe
+
+        from django.views.generic.edit import FormMixin
+        return FormMixin.form_valid(self, form)
